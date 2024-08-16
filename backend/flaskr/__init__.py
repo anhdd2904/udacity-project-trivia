@@ -1,11 +1,6 @@
 
 from flask import Flask, request, abort, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
-import random
-import json
-from sqlalchemy import text, sql
-from sqlalchemy.testing import db
+from sqlalchemy.sql import text
 
 from models import setup_db, Question, Category
 from flask_cors import CORS
@@ -195,39 +190,47 @@ def create_app(test_config=None):
     """
     @app.route("/trivia/v1/questions_search", methods=["POST"])
     def search_question():
-        search_param = request.json['searchTerm']
-        search = "%{}%".format(search_param)
-        questions_list= Question.query.filter(Question.question.like(search)).all()
-        print("questions_list: ",questions_list)
-        questions_result = [question.format() for question in questions_list]
-        totalQuestions = len(questions_list)
+        try:
+            search_param = request.json['searchTerm']
+            search = "%{}%".format(search_param)
+            questions_list= Question.query.filter(Question.question.like(search)).all()
+            print("questions_list: ",questions_list)
+            questions_result = [question.format() for question in questions_list]
+            totalQuestions = len(questions_list)
 
-        return jsonify(
-            {
-                'questions': questions_result,
-                'totalQuestions': totalQuestions,
-                'currentCategory': 'Entertainment',
+            return jsonify(
+                {
+                    'questions': questions_result,
+                    'totalQuestions': totalQuestions,
+                    'currentCategory': 'Entertainment',
+                    "message": "successfully"
+                }
+            ), 200
+        except:
+            return jsonify({
+                "message": "error"
+            }), 500
+
+    @app.route("/trivia/v1/categories/<id_category>/questions", methods=["GET"])
+    def get_questions_by_category(id_category):
+        try:
+            questions = Question.query.filter_by(category=text(id_category)).all()
+            current_category = Category.query.filter_by(id=text(id_category))
+            questions_list = [question.format() for question in questions]
+            totalQuestions = len(questions_list)
+            currentCategory = [category.format()['type'] for category in current_category]
+
+            return jsonify({
+                "questions": questions_list,
+                "totalQuestions": totalQuestions,
+                "currentCategory": currentCategory,
                 "message": "successfully"
-            }
-        )
+            }),200
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "error"
+            }), 500
 
-
-    """
-    @TODO:
-    Create a POST endpoint to get questions to play the quiz.
-    This endpoint should take category and previous question parameters
-    and return a random questions within the given category,
-    if provided, and that is not one of the previous questions.
-
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not.
-    """
-
-    """
-    @TODO:
-    Create error handlers for all expected errors
-    including 404 and 422.
-    """
 
     return app

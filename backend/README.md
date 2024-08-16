@@ -188,6 +188,26 @@ You will need to provide detailed documentation of your API endpoints including 
     "currentCategory": "Entertainment"
 }
 ```
+
+`GET '/categories/${id}/questions'`
+- Fetches questions for a cateogry specified by id request argument
+- Request Arguments: id - integer
+- Returns: An object with questions for the specified category, total questions, and current category string
+```json
+{
+    "questions": [
+        {
+            "id": 1,
+            "question": "This is a question",
+            "answer": "This is an answer",
+            "difficulty": 5,
+            "category": 4
+        }
+    ],
+    "totalQuestions": 100,
+    "currentCategory": "History"
+}
+```
 ## Testing
 
 Write at least one test for the success and at least one error behavior of each endpoint using the unittest library.
