@@ -6,7 +6,7 @@ import json
 from flaskr import create_app
 
 from settings import DB_NAME, DB_USER,DB_PASSWORD
-
+from models import setup_db, Question, Category
 database_name= DB_NAME
 database_path = 'postgresql://{}:{}@{}/{}'.format(DB_USER,DB_PASSWORD,'localhost:5432', database_name)
 
@@ -45,8 +45,11 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertTrue(len(data['questions']) == 0)
 
-    def delete_qes_by_id(self):
-        res = self.client().delete('/trivia/v1/questions/1')
+    def test_delete_qes_by_id(self):
+        questions = Question.query.all()
+        question = questions[0]
+        id = str(question.id)
+        res = self.client().delete('/trivia/v1/questions/' + id)
         data = json.loads(res.data)
 
         self.assertEquals(res.status_code, 200)

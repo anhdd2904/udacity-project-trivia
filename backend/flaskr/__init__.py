@@ -43,6 +43,26 @@ def create_app(test_config=None):
         response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
         return response
 
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        response = {
+            "error": "Not Found",
+            "message": "The requested resource could not be found.",
+            "status_code": 404
+        }
+        return jsonify(response), 404
+
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        response = {
+            "error": "Internal Server Error",
+            "message": "An unexpected error occurred on the server.",
+            "status_code": 500
+        }
+        return jsonify(response), 500
+
     """
     @TODO:
     Create an endpoint to handle GET requests
@@ -71,6 +91,7 @@ def create_app(test_config=None):
     ten questions per page and pagination at the bottom of the screen for three pages.
     Clicking on the page numbers should update the questions.
     """
+
 
     @app.route("/trivia/v1/questions", methods=["GET"])
     def find_all_question():
@@ -167,11 +188,16 @@ def create_app(test_config=None):
             else:
                 questions = Question.query.filter(Question.id.notin_(previous_questions),
                      Question.category == quiz_category['id']).all()
+
         except Exception as e:
             print(e)
             return jsonify({
                 "status_message": "Error"
             })
+        if len(questions) == 0:
+            return jsonify({
+                "status_message": "This category is out of questions"
+            }), 200
         questions_list = [question.format() for question in questions]
         return jsonify(
             {
