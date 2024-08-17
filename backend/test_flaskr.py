@@ -52,14 +52,14 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().delete('/trivia/v1/questions/' + id)
         data = json.loads(res.data)
 
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
         self.assertTrue(data['message'])
 
     def test_500_delete_qes_by_id_notfound(self):
         res = self.client().delete('/trivia/v1/questions/-1')
         data = json.loads(res.data)
 
-        self.assertEquals(res.status_code, 500)
+        self.assertEqual(res.status_code, 500)
 
     def test_add_question(self):
         request = {
@@ -71,7 +71,7 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().post('/trivia/v1/questions', json=request)
         data = json.loads(res.data)
 
-        self.assertEquals(res.status_code, 201)
+        self.assertEqual(res.status_code, 201)
         self.assertTrue(data['message'])
 
     def test_500_add_question(self):
@@ -84,7 +84,7 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().post('/trivia/v1/questions', json=request)
         data = json.loads(res.data)
 
-        self.assertEquals(res.status_code, 500)
+        self.assertEqual(res.status_code, 500)
         self.assertEqual(data['message'],'Create question error')
     def test_get_next_question(self):
         request = {
